@@ -3,16 +3,19 @@ import 'package:postgres/postgres.dart';
 import 'User.dart';
 import 'Club.dart';
 
-void main() => runApp(const ClubApp());
-
-var databaseConnection = PostgreSQLConnection("localhost", 5432, "postgres",
-    username: "postgres", password: "12131213ok!");
+var databaseConnection = PostgreSQLConnection(
+    'localhost', 5432, 'midyear',
+    queryTimeoutInSeconds: 3600,
+    timeoutInSeconds: 3600,
+    username: 'postgres',
+    password: '12131213ok!');
 initDatabaseConnection() async {
   databaseConnection.open().then((value) {
     print("Database Connected!");
   });
 }
 
+void main() => runApp(const ClubApp());
 class ClubApp extends StatelessWidget {
   const ClubApp({super.key});
   @override
@@ -44,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List screens = [
     const HomePage(),
     const StatusPage(),
-    SearchPage(),
+    const SearchPage(),
     const InformationPage(),
   ];
 
@@ -62,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
         toolbarOpacity: 0.9,
       ),
       body: screens[index],
+
       bottomNavigationBar: buildMyNavigationBar(context),
     );
   }
@@ -162,12 +166,37 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.green,
+        color: Colors.white,
         child: Center(
             child: Column(
               children: <Widget>[
                 Text("Do your job here Jeff or Ryan"),
+                ElevatedButton(
+                  onPressed: () async {
+                    bool exist = false;
+                    var connection = PostgreSQLConnection(
+                        "localhost", 5432, "midyear",
+                        username: "postgres", password: "12131213ok!");
+                  await connection.open();
+                    List<Map<String, Map<String, dynamic>>> result =
+                    await connection.mappedResultsQuery(
+                        'SELECT name FROM public."Users"');
+                    print(result);
+                  },
+                  child: const Text(
+                    "Login",
+                    style: TextStyle(color: Colors.black, fontSize: 15),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
+                  ),
+                ),
               ],
+
             )));
   }
 }
@@ -307,3 +336,4 @@ class InformationPage extends StatelessWidget{
     );
   }
 }
+
