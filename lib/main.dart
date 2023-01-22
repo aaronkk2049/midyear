@@ -3,16 +3,7 @@ import 'package:postgres/postgres.dart';
 import 'User.dart';
 import 'Club.dart';
 
-var databaseConnection = PostgreSQLConnection('localhost', 5432, 'midyear',
-    queryTimeoutInSeconds: 3600,
-    timeoutInSeconds: 3600,
-    username: 'postgres',
-    password: '12131213ok!');
-initDatabaseConnection() async {
-  databaseConnection.open().then((value) {
-    print("Database Connected!");
-  });
-}
+
 
 void main() => runApp(const ClubApp());
 
@@ -346,8 +337,8 @@ dynamic getConnection(BuildContext context) {
   bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
   String hostURL = "10.0.2.2";
   if (isIOS) hostURL = "localhost";
-  return PostgreSQLConnection(hostURL, 5432, "mydb",
-      username: "postgres", password: "123");
+  return PostgreSQLConnection(hostURL, 5432, "midyear",
+      username: "postgres", password: "12131213ok!");
 }
 
 class LoginPage extends StatefulWidget {
@@ -398,7 +389,7 @@ class _LoginPageState extends State<LoginPage> {
                     await DB.open();
                     List<Map<String, Map<String, dynamic>>> result = await DB
                         .mappedResultsQuery(
-                            'SELECT * FROM Users WHERE email = @aEmail',
+                            'SELECT * FROM public."Users" WHERE email = @aEmail',
                             substitutionValues: {
                           "aEmail": enteredEm,
                         });
@@ -409,8 +400,8 @@ class _LoginPageState extends State<LoginPage> {
                               alert(context, 'dne'));
                     } else {
                       print(result);
-                      Map<String, dynamic> userinfo = result[0]['users']!;
-                      if (userinfo['password'] != (enteredPw)) {
+                      Map<String, dynamic> userinfo = result[0]['Users']!;
+                      if (userinfo['password'] != (enteredPw) ) {
                         showDialog<String>(
                             context: context,
                             builder: (BuildContext context) =>

@@ -5,6 +5,7 @@ class User {
   String email;
   String homeroom;
   bool detention;
+  String password;
   User(
       this.status,
       this.name,
@@ -12,5 +13,6 @@ class User {
       this.email,
       this.homeroom,
       this.detention,
+      this.password,
       );
 }
