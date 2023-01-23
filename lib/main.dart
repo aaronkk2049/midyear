@@ -84,15 +84,15 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               icon: index == 0
                   ? Icon(
-                      Icons.home_filled,
-                      color: Colors.yellow[800],
-                      size: 35,
-                    )
+                Icons.home_filled,
+                color: Colors.yellow[800],
+                size: 35,
+              )
                   : Icon(
-                      Icons.home_outlined,
-                      color: Colors.yellow[800],
-                      size: 35,
-                    ),
+                Icons.home_outlined,
+                color: Colors.yellow[800],
+                size: 35,
+              ),
             ),
             IconButton(
               enableFeedback: false,
@@ -103,15 +103,15 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               icon: index == 1
                   ? Icon(
-                      Icons.fastfood_rounded,
-                      color: Colors.yellow[800],
-                      size: 35,
-                    )
+                Icons.content_paste_search,
+                color: Colors.yellow[800],
+                size: 35,
+              )
                   : Icon(
-                      Icons.fastfood_outlined,
-                      color: Colors.yellow[800],
-                      size: 35,
-                    ),
+                Icons.content_paste_rounded,
+                color: Colors.yellow[800],
+                size: 35,
+              ),
             ),
             IconButton(
               enableFeedback: false,
@@ -122,15 +122,15 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               icon: index == 2
                   ? Icon(
-                      Icons.local_drink_rounded,
-                      color: Colors.yellow[800],
-                      size: 35,
-                    )
+                Icons.search,
+                color: Colors.yellow[800],
+                size: 35,
+              )
                   : Icon(
-                      Icons.local_drink_outlined,
-                      color: Colors.yellow[800],
-                      size: 35,
-                    ),
+                Icons.search_outlined,
+                color: Colors.yellow[800],
+                size: 35,
+              ),
             ),
             IconButton(
               enableFeedback: false,
@@ -141,15 +141,15 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               icon: index == 3
                   ? Icon(
-                      Icons.food_bank,
-                      color: Colors.red[800],
-                      size: 35,
-                    )
+                Icons.account_circle_outlined,
+                color: Colors.red[800],
+                size: 35,
+              )
                   : Icon(
-                      Icons.food_bank_outlined,
-                      color: Colors.yellow[800],
-                      size: 35,
-                    ),
+                Icons.account_circle_rounded,
+                color: Colors.yellow[800],
+                size: 35,
+              ),
             ),
           ],
         ));
@@ -372,8 +372,9 @@ class _InformationPageState extends State<InformationPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.green,
+        color: Colors.white,
         child: Column(children: <Widget>[
+          buildProfileImage(),
           Text("", textScaleFactor: 5),
           Text(""),
           Text("Name: ${widget.currentUser.name}"),
@@ -397,7 +398,15 @@ class _InformationPageState extends State<InformationPage> {
           }),
         ]));
   }
+  Widget buildProfileImage() => CircleAvatar(
+    radius: 100,
+    backgroundColor: Colors.grey.shade800,
+    backgroundImage: const NetworkImage(
+        'https://scontent.cdninstagram.com/v/t51.39111-15/326538019_154697504025623_1136485149043501290_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=5a057b&_nc_ohc=ud5sG-nNxd0AX-fOyDm&_nc_ad=z-m&_nc_cid=0&_nc_ht=scontent.cdninstagram.com&oh=02_AVAjrGXbJnN2UJucxSLiSlwgQ99GNzvj466uw8X6BeCRiQ&oe=63D32573'
+    ),
+  );
 }
+
 
 
 
