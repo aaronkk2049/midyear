@@ -27,7 +27,7 @@ class ClubApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title, required this.user});
+  const MyHomePage({super.key, required this.title, required this.user, });
   final String title;
   final User user;
 
@@ -226,8 +226,14 @@ class SearchPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              showSearch(context: context, delegate: SearchBar());
+            onPressed: () async {
+              var DB= getConnection(context);
+              await DB.open();
+              List<dynamic> result =await DB.query(
+                  'SELECT name FROM public."Clubs"'
+              );
+              print(result);
+              showSearch(context: context, delegate: SearchBar(result));
             },
             icon: const Icon(Icons.search),
           )
@@ -239,17 +245,9 @@ class SearchPage extends StatelessWidget {
 
 class SearchBar extends SearchDelegate {
 // Demo list to show querying
-  List<String> searchTerms = [
-    "Apple",
-    "Banana",
-    "Mango",
-    "Pear",
-    "Watermelons",
-    "Blueberries",
-    "Pineapples",
-    "Strawberries"
-  ];
-  // need to replace with the database club names
+
+ List<dynamic> searchTerms;
+SearchBar(this.searchTerms);
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [
@@ -265,7 +263,7 @@ class SearchBar extends SearchDelegate {
   @override
   Widget? buildLeading(BuildContext context) {
     return IconButton(
-      onPressed: () {
+      onPressed: () async {
         close(context, null);
       },
       icon: Icon(Icons.arrow_back),
@@ -276,8 +274,8 @@ class SearchBar extends SearchDelegate {
   Widget buildResults(BuildContext context) {
     List<String> matchQuery = [];
     for (var fruit in searchTerms) {
-      if (fruit.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(fruit);
+      if (fruit[0].contains(query)) {
+        matchQuery.add(fruit[0]);
       }
     }
     return ListView.builder(
@@ -297,8 +295,8 @@ class SearchBar extends SearchDelegate {
   Widget buildSuggestions(BuildContext context) {
     List<String> matchQuery = [];
     for (var fruit in searchTerms) {
-      if (fruit.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(fruit);
+      if (fruit[0].contains(query)) {
+        matchQuery.add(fruit[0]);
       }
     }
     return ListView.builder(
