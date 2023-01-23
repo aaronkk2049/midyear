@@ -39,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
   _MyHomePageState() {
     index = 0;
     screens = [
-      () => const HomePage(),
+      () => const HomePage(title: "Bronx Science Clubs"),
       () => StatusPage(currentUser: widget.user),
       () => const SearchPage(),
       () => InformationPage(currentUser: widget.user),
@@ -157,58 +157,106 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
-
+  const HomePage({Key? key, required String title}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Container(
-        color: Colors.white,
-        child: Center(
-            child: Column(
-          children: <Widget>[
-            Text("Do your job here Jeff or Ryan"),
-            ElevatedButton(
-              onPressed: () async {
-                bool exist = false;
-                var connection = PostgreSQLConnection(
-                    "localhost", 5432, "midyear",
-                    username: "postgres", password: "12131213ok!");
-                await connection.open();
-                List<Map<String, Map<String, dynamic>>> result =
-                    await connection
-                        .mappedResultsQuery('SELECT name FROM public."Users"');
-                print(result);
-              },
-              child: const Text(
-                "Login",
-                style: TextStyle(color: Colors.black, fontSize: 15),
-              ),
-              style: ElevatedButton.styleFrom(
-                primary: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 45, vertical: 15),
-              ),
+    return Scaffold(
+      body: Stack(
+          alignment: Alignment.center,
+          children: [
+            buildCoverImage(),
+            Text("", textScaleFactor: 5),
+            Positioned(
+              top: 200,
+              child:buildProfileImage(),
             ),
-          ],
-        )));
+            Positioned(
+                bottom: 200,
+                child: const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child:Text("Created by Aaron Kim, \nRyan Wang, Haoking Luo, \nand Jefferson Lin", style: TextStyle(fontStyle: FontStyle.italic, fontSize: 25, fontWeight: FontWeight.w700, color: Color.fromRGBO(0, 0, 0, 1),)),),
+                )
+            ),
+          ]
+      ),
+    );
   }
 }
+Widget buildProfileImage() => CircleAvatar(
+  radius: 100,
+  backgroundColor: Colors.grey.shade800,
+  backgroundImage: const NetworkImage(
+      'https://scontent.cdninstagram.com/v/t51.39111-15/326538019_154697504025623_1136485149043501290_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=5a057b&_nc_ohc=ud5sG-nNxd0AX-fOyDm&_nc_ad=z-m&_nc_cid=0&_nc_ht=scontent.cdninstagram.com&oh=02_AVAjrGXbJnN2UJucxSLiSlwgQ99GNzvj466uw8X6BeCRiQ&oe=63D32573'
+  ),
+);
+
+
+Widget buildCoverImage() => Container(
+  color: Colors.grey,
+  child: Image.network(
+    'https://cdn.discordapp.com/attachments/789263917515014154/1066921131866587207/image.png',
+    width: double.infinity,
+    height: double.infinity,
+    fit: BoxFit.cover,
+  ),
+);
+
 
 class StatusPage extends StatelessWidget {
   User currentUser;
   StatusPage({Key? key, required this.currentUser}) : super(key: key);
+  String statusDescribe(User currentUser){
+    if(currentUser.status){
+      return 'student';
+    }
+    else{
+      return 'advisor';
+    }
+  }
+  String detentionDescribe(User currentUser){
+    if(currentUser.status){
+      if(currentUser.detention){
+        return 'You currently have a suspeneded privilege. Please attend club after it is dismissed.';
+      }
+      else{
+        return 'You currently is available to attend clubs.';
+      }
+    }
+    else{
+      return 'You are an advisor for student clubs.';
+    }
+  }
+  getList(User currentUser) async {
+    var connection = PostgreSQLConnection(
+        "localhost", 5432, "midyear",
+        username: "postgres", password: "12131213ok!");
+    await connection.open();
+    String name= currentUser.name;
+    if(currentUser.status){
+      if (currentUser.detention){
+        return null;
+      }
+      else{
+        List<dynamic> result= await connection.query('SELECT name FROM Clubs WHERE president= $name OR vicepresident= $name OR secretary= $name ');
+        return result;
+      }
+    }
+    else{
+      List<dynamic> result= await connection.query('SELECT name FROM Clubs WHERE advisor= $name');
+      return result;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.green,
+      color: Colors.white,
       child: Center(
         child: Column(children: <Widget>[
           Text(currentUser.name),
-          Text(currentUser.email),
           Text(currentUser.osis),
-          Text(currentUser.homeroom),
+          Text(statusDescribe(currentUser)),
+          Text(detentionDescribe(currentUser)),
         ]),
       ),
     );
@@ -311,25 +359,47 @@ SearchBar(this.searchTerms);
   }
 }
 
-class InformationPage extends StatelessWidget {
-  const InformationPage({Key? key, required this.currentUser})
-      : super(key: key);
-  final User currentUser;
+
+class InformationPage extends StatefulWidget {
+  InformationPage({required this.currentUser});
+  User currentUser;
+  @override
+  _InformationPageState createState() => _InformationPageState();
+}
+
+
+class _InformationPageState extends State<InformationPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.green,
-      child: Center(
+        color: Colors.green,
         child: Column(children: <Widget>[
-          Text(currentUser.name),
-          Text(currentUser.email),
-          Text(currentUser.osis),
-          Text(currentUser.homeroom),
-        ]),
-      ),
-    );
+          Text("", textScaleFactor: 5),
+          Text(""),
+          Text("Name: ${widget.currentUser.name}"),
+          TextField(onSubmitted: (String s) {
+            setState(() {
+              widget.currentUser.editName(s, getConnection(context));
+            });
+          }),
+          Text("Email: ${widget.currentUser.email}"),
+          Text("OSIS: ${widget.currentUser.osis}"),
+          TextField(onSubmitted: (String s) {
+            setState(() {
+              widget.currentUser.editOSIS(s, getConnection(context));
+            });
+          }),
+          Text("Homeroom: ${widget.currentUser.homeroom}"),
+          TextField(onSubmitted: (String s) {
+            setState(() {
+              widget.currentUser.editHomeroom(s, getConnection(context));
+            });
+          }),
+        ]));
   }
 }
+
+
 
 dynamic getConnection(BuildContext context) {
   bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
